@@ -1,34 +1,37 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 import { HouseholdStep } from '../../forms/Household';
 
 import { CLIENT_DEFAULTS } from '../../utils/CLIENT_DEFAULTS';
-import snippets from '../../localization/en.js';
 
-test('Household step component renders as snapshot correctly', () => {
+// LOCALIZATION
+import { getTextForLanguage } from '../../utils/getTextForLanguage';
+
+
+const translations = getTextForLanguage(`en`);
+test('Household step component should render without error', () => {
   const navData = {
-          left:   { text: 'Previous', onClick: jest.fn() },
+          left:   (<div>House left</div>),
           middle: null,
-          right:  { text: 'Next', onClick: jest.fn() },
+          right:  (<div>House right</div>),
         },
-        changeClient     = jest.fn(),
-        saveForm         = jest.fn(),
-        askToResetClient = jest.fn(),
-        openFeedback     = jest.fn(),
-        formSnippets     = snippets.visitPage.household;
+        updateClientValue = jest.fn(),
+        saveForm          = jest.fn(),
+        askToResetClient  = jest.fn(),
+        openFeedback      = jest.fn(),
+        formTranslations  = translations.visitPage.household;
 
-  const wrapper = shallow(
-    <HouseholdStep
-      currentStep       = { 2 }
-      client            = { CLIENT_DEFAULTS }
-      navData           = { navData }
-      changeClient      = { changeClient }
-      saveForm          = { saveForm }
-      askToResetClient  = { askToResetClient }
-      openFeedback      = { openFeedback }
-      snippets          = { formSnippets } />
-  );
-
-  expect(wrapper).toMatchSnapshot();
+  expect(() => {
+    mount(
+      <HouseholdStep
+        client            = { CLIENT_DEFAULTS }
+        navData           = { navData }
+        updateClientValue = { updateClientValue }
+        saveForm          = { saveForm }
+        askToResetClient  = { askToResetClient }
+        openFeedback      = { openFeedback }
+        translations      = { formTranslations } />
+    );
+  }).not.toThrow();
 });

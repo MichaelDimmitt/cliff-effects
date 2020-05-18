@@ -12,10 +12,14 @@ import {
   UNEARNED_INCOME_SOURCES,
   UNDER13_CARE_EXPENSES,
   OVER12_CARE_EXPENSES,
+  ALL_MEDICAL_EXPENSES,
+  NON_TRANSPORT_DEPENDENT_COSTS,
+  TRANSPORT_DEPENDENT_COSTS,
+  HOMEOWNER_COSTS,
 } from '../data/massachusetts/name-cores';
 
 // ==================================
-// DEDUCTIONS
+// DEPENDENTS
 // ==================================
 /** 
  * Total MONTHLY dependent costs, including for those under and over
@@ -28,9 +32,9 @@ import {
  * @returns {number} - Total dependent care expenses
  */
 const getDependentCostsMonthly = function (client) {
-  var props = UNDER13_CARE_EXPENSES.concat(OVER12_CARE_EXPENSES);
+  let props = UNDER13_CARE_EXPENSES.concat(OVER12_CARE_EXPENSES);
   return sumProps(client, props);
-};  // End getDependentCostsMonthly()
+};
 
 
 /**
@@ -43,7 +47,44 @@ const getDependentCostsMonthly = function (client) {
  */
 const getUnder13Expenses = function (client) {
   return sumProps(client, UNDER13_CARE_EXPENSES);
-};  // End getUnder13Expenses()
+};
+
+
+const getOver12Expenses = function (client) {
+  return sumProps(client, OVER12_CARE_EXPENSES);
+};
+
+
+const getMedicalExpenses = function (client) {
+  return sumProps(client, ALL_MEDICAL_EXPENSES);
+};
+
+
+const getNonTransportCareCosts = function (client) {
+  return sumProps(client, NON_TRANSPORT_DEPENDENT_COSTS);
+};
+
+
+const getTransportDependentCosts = function (client) {
+  return sumProps(client, TRANSPORT_DEPENDENT_COSTS);
+};
+
+
+// ==================================
+// OTHER EXPENSES
+// ==================================
+const getHousingCosts = function (client) {
+  let housing = client.housing;
+  if (housing === `homeless`) {
+    return 0;
+  } else if (housing === `voucher`) {
+    return client.rentShare;
+  } else if (housing === `renter`) {
+    return client.rent;
+  } else if (housing === `homeowner`) {
+    return sumProps(client, HOMEOWNER_COSTS);
+  }
+};
 
 
 // ==================================
@@ -60,7 +101,7 @@ const getUnder13Expenses = function (client) {
  */
 const getGrossUnearnedIncomeMonthly = function (client) {
   return sumProps(client, UNEARNED_INCOME_SOURCES);
-};  // End getGrossUnearnedIncomeMonthly()
+};
 
 
 /**
@@ -74,10 +115,10 @@ const getGrossUnearnedIncomeMonthly = function (client) {
  *     income with no deductions or exclusions.
  */
 const getSimpleGrossIncomeMonthly = function (client) {
-  var earned    = client.earned,
-      unearned  = getGrossUnearnedIncomeMonthly(client);
+  let earned   = client.earned,
+      unearned = getGrossUnearnedIncomeMonthly(client);
   return earned + unearned;
-};  // End getSimpleGrossIncomeMonthly()
+};
 
 
 // ==================================
@@ -95,12 +136,17 @@ const getSimpleGrossIncomeMonthly = function (client) {
  */
 const sumProps = function (obj, props) {
   return sum(values(pick(obj, props)));
-};  // End sumProps()
+};
 
 
 export {
   getDependentCostsMonthly,
   getUnder13Expenses,
+  getOver12Expenses,
+  getMedicalExpenses,
+  getNonTransportCareCosts,
+  getTransportDependentCosts,
+  getHousingCosts,
   getSimpleGrossIncomeMonthly,
   getGrossUnearnedIncomeMonthly,
   sumProps,

@@ -1,25 +1,31 @@
 import React from 'react';
 import { Step } from 'semantic-ui-react';
 
-const StepBar = ({ steps, currentStepIndex, goToStep, snippets }) => {
+import { STEP_VALS } from '../forms/STEP_VALS';
 
-  var cleanSteps = [];
 
-  steps.forEach((step, index) => {
-    var newStep = { title: snippets[ step.key ] };
-    newStep.active = index === (currentStepIndex - 1);
-    newStep.onClick = (e) => {
-      goToStep(index + 1); 
-    };
-    newStep.key = index;
+const StepBar = ({ currentStepKey, goToStep, translations }) => {
+
+  let cleanSteps = [];
+
+  STEP_VALS.forEach((step, index) => {
+    let newStep = { title: { content: translations[ `i_` + step.key ] }};
+
+    newStep.active  = step.key === currentStepKey;
+    newStep.onClick = function (event) { goToStep({ key: step.key }); };
+    newStep.key     = index;
+
     cleanSteps[ index ] = newStep;
   });
 
-  return (<Step.Group
-    className='six'
-    size='mini'
-    ordered
-    items={ cleanSteps } />);
+  return (
+    <Step.Group
+      className = { `six` }
+      size      = { `mini` }
+      items     = { cleanSteps }
+      ordered />
+  );
 };
 
-export default StepBar;
+
+export { StepBar };

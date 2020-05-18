@@ -1,34 +1,37 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 import { CurrentBenefitsStep } from '../../forms/CurrentBenefits';
 
 import { CLIENT_DEFAULTS } from '../../utils/CLIENT_DEFAULTS';
-import snippets from '../../localization/en.js';
 
-test('Benefits step component renders as snapshot correctly', () => {
+// LOCALIZATION
+import { getTextForLanguage } from '../../utils/getTextForLanguage';
+
+
+const translations = getTextForLanguage(`en`);
+test('Benefits step component should render without error', () => {
   const navData = {
           left:   null,
           middle: null,
-          right:  { text: 'Next', onClick: jest.fn() },
+          right:  (<div>CB right</div>),
         },
-        changeClient     = jest.fn(),
-        saveForm         = jest.fn(),
-        askToResetClient = jest.fn(),
-        openFeedback     = jest.fn(),
-        formSnippets     = snippets.visitPage.currentBenefits;
+        updateClientValue    = jest.fn(),
+        saveForm             = jest.fn(),
+        askToResetClient     = jest.fn(),
+        openFeedback         = jest.fn(),
+        benefitsTranslations = translations.visitPage.currentBenefits;
 
-  const wrapper = shallow(
-    <CurrentBenefitsStep
-      currentStep       = { 1 }
-      client            = { CLIENT_DEFAULTS }
-      navData           = { navData }
-      changeClient      = { changeClient }
-      saveForm          = { saveForm }
-      askToResetClient  = { askToResetClient }
-      openFeedback      = { openFeedback }
-      snippets          = { formSnippets } />
-  );
-
-  expect(wrapper).toMatchSnapshot();
+  expect(() => {
+    mount(
+      <CurrentBenefitsStep
+        client            = { CLIENT_DEFAULTS }
+        navData           = { navData }
+        updateClientValue = { updateClientValue }
+        saveForm          = { saveForm }
+        askToResetClient  = { askToResetClient }
+        openFeedback      = { openFeedback }
+        translations      = { benefitsTranslations } />
+    );
+  }).not.toThrow();
 });

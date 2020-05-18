@@ -1,51 +1,52 @@
 import React, { Component } from 'react';
+import { Message } from 'semantic-ui-react';
 
 // CUSTOM COMPONENTS
-import { GraphTimeButtons } from '../../components/GraphTimeButtons';
+import { GraphTimeButtons } from './GraphTimeButtons';
 
 
+/** Keeps track of time interval currently requested
+ *      (weekly/monthly/yearly) and, if needed, shows
+ *      'no graph' message. */
 class GraphHolder extends Component {
 
   constructor (props) {
     super(props);
-    this.state = { activeID: 'Yearly' };
+    this.state = { activeID: `Monthly` };
   }
 
   onClick = (evnt) => {
-    var id = evnt.target.id;
+    let id = evnt.target.id;
     this.setState({ activeID: id });
   };
 
   render () {
-    const { activeID }  = this.state,
-          { Graph, client }         = this.props,
-          { current }               = client,
-          activePrograms            = [];
+    const { activeID }                    = this.state,
+          { Graph, client, translations } = this.props,
+          { current }                     = client,
+          // The ids later used to access all program-specific data and functions
+          // Only active programs are added
+          activePrograms                  = [ ...current.benefits ];
 
-    // The ids later used to access all program-specific data and functions
-    // Only active programs are added
-    if (current.hasSection8) { 
-      activePrograms.push('section8');
-    }
-    if (current.hasSnap)    {
-      activePrograms.push('snap');
+    if (activePrograms.length === 0) {
+      return <Message className={ `graph-holder` }>{ translations.i_noBenefitsSelected }</Message>;
     }
 
     return (
-      <div className='graph-holder'>
-        <Graph
-          className='client-graph'
-          client={ client }
-          timescale={ activeID }
-          activePrograms={ activePrograms } />
+      <div className={ `graph-holder` }>
         <GraphTimeButtons
-          activeID={ activeID }
-          onClick={ this.onClick } />
+          activeID = { activeID }
+          onClick  = { this.onClick } />
+        <Graph
+          className      = { `client-graph` }
+          client         = { client }
+          timescale      = { activeID }
+          activePrograms = { activePrograms }
+          translations   = { translations } />
       </div>
     );
-  };  // End render()
-
-};  // End <GraphHolder>
+  };  // Ends render()
+};  // Ends <GraphHolder>
 
 
 export { GraphHolder };

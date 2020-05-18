@@ -1,133 +1,208 @@
 import React from 'react';
-import { Form, Divider, Header, Tab } from 'semantic-ui-react';
+import {
+  Divider,
+  Header,
+  Tab,
+  Message,
+  Button,
+  Menu,
+} from 'semantic-ui-react';
 
 // PROJECT COMPONENTS
-import { FormPartsContainer, IntervalColumnHeadings, CashFlowRow } from './formHelpers';
+import { FormPartsContainer } from './FormPartsContainer';
+import { IntervalColumnHeadings } from '../components/headings';
+import { CashFlowInputsRow } from './cashflow';
 import { GraphHolder } from './output/GraphHolder';
+import { Summary } from './output/Summary';
 import { BenefitsTable } from './output/BenefitsTable';
-import { StackedBarGraph } from './output/StackedBarGraph';
-import { StackedAreaGraph } from './output/StackedAreaGraph';
-import { BenefitsLineGraph } from './output/BenefitsLineGraph';
-
-// COMPONENT HELPER FUNCTIONS
-import { getTimeSetter } from '../utils/getTimeSetter';
+import { ResourcesColumns } from './output/ResourcesColumns';
+import { StackedResources } from './output/StackedResources';
+import { BenefitsLines } from './output/BenefitsLines';
 
 
-// ========================================
-// COMPONENTS
-// ========================================
-/** @todo description
-*
-* @function
-* @param {object} props Values described below
-* @property {object} props.future Client future/predictive data.
-* @property {string} props.time Used in class names. Meant to make
-*     this more easily decoupled in future.
-* @property {function} props.setClientProperty Update client state
-*     values.
-*
-* @returns {class} Component
-*/
-const IncomeForm = function ({ future, time, setClientProperty }) {
+/** @todo Cash flow row for trying out different future incomes.
+ *
+ * As per Project Hope's input, for the first prototype
+ *     we're only including the ability to change earned income.
+ *
+ * @function
+ * @param {object} props
+ * @param {object} props.future Client future/predictive data.
+ * @param {string} props.time Used in class names. Meant to make
+ *     this more easily decoupled in future.
+ * @param {function} props.updateClientValue Update client state
+ *     value.
+ * @param {object} props.translations Language-specific text
+ *
+ * @returns {object} React element
+ */
+const IncomeForm = function ({ future, time, updateClientValue, translations }) {
 
-  var type = 'income';
+  let type = `income`;
 
-  /**
-  * As per Project Hope input, for the first prototype we're only
-  * including the ability to change earned income.
-  */
   return (
-    <div className='field-aligner two-column'>
+    <div className={ `field-aligner two-column` }>
       <IntervalColumnHeadings type={ type } />
-      <CashFlowRow
-        timeState={ future }
-				  type={ type }
-				  time={ time }
-				  setClientProperty={ setClientProperty }
-				  generic='earned'
-				  labelInfo='(Weekly income = hourly wage times average number of work hours per week)'>
-          How much money would you get paid in the future? (You can try different amounts)
-      </CashFlowRow>
+      <CashFlowInputsRow
+        timeState         = { future }
+        type              = { type }
+        time              = { time }
+        updateClientValue = { updateClientValue }
+        generic           = { `earned` }
+        labelInfo         = { `(Weekly pay = hourly wage times average number of work hours per week)` }>
+        { translations.i_futureIncomeQuestion }
+      </CashFlowInputsRow>
     </div>
   );
-};  // End IncomeForm() Component
+};
 
 
-const TabbedVisualizations = ({ client }) => {
+const TabbedVisualizations = ({ client, openFeedback, translations }) => {
   return (
-  // Benefit Courses, Tracks, Routes, Traces, Progressions, Progress, Trajectories, Changes
     <Tab
-      menu={{ color: 'teal',  attached: true, tabular: true }}
-      panes={ [
-        { menuItem: 'Changes', render: () => {return <Tab.Pane><BenefitsTable client={ client } /></Tab.Pane>;} },
-        { menuItem: 'Changes Chart', render: () => {return <Tab.Pane><StackedBarGraph client={ client } /></Tab.Pane>;} },
+      menu  = {{ color: `teal`,  attached: true, tabular: true }}
+      panes = { [
         {
-          menuItem: 'Stacked Incomes',
-          render:   () => {
+          menuItem: (
+            <Menu.Item
+              key = { `tab0` }
+              as  = { Button }>
+              { translations.i_summaryTitle }
+            </Menu.Item>
+          ),
+          render: () => { return (
+            <Tab.Pane><Summary
+              client       = { client }
+              openFeedback = { openFeedback }
+              translations = { translations } />
+            </Tab.Pane>
+          );}, 
+        },
+        { 
+          menuItem: (
+            <Menu.Item
+              key = { `tab1` }
+              as  = { Button }>
+              { translations.i_tabTitleChanges }
+            </Menu.Item>
+          ),
+          render: () => {
             return (
               <Tab.Pane>
-                <GraphHolder
-                  client={ client }
-                  Graph={ StackedAreaGraph } />
+                <BenefitsTable
+                  client       = { client }
+                  translations = { translations } />
               </Tab.Pane>
             );
           },
         },
         {
-          menuItem: 'Benefit Programs',
-          render:   () => {
+          menuItem: (
+            <Menu.Item
+              key = { `tab2` }
+              as  = { Button }>
+              { translations.i_tabTitleChangesChart }
+            </Menu.Item>
+          ),
+          render: () => { return (
+            <Tab.Pane>
+              <GraphHolder
+                client       = { client }
+                Graph        = { ResourcesColumns }
+                translations = { translations } />
+            </Tab.Pane>
+          );},
+        },
+        {
+          menuItem: (
+            <Menu.Item
+              key = { `tab3` }
+              as  = { Button }>
+              { translations.i_tabTitleStackedIncomes }
+            </Menu.Item>
+          ),
+          render: () => {
             return (
               <Tab.Pane>
                 <GraphHolder
-                  client={ client }
-                  Graph={ BenefitsLineGraph } />
+                  client       = { client }
+                  Graph        = { StackedResources }
+                  translations = { translations } />
+              </Tab.Pane>
+            );
+          },
+        },
+        {
+          menuItem: (
+            <Menu.Item
+              key = { `tab4` }
+              as  = { Button }>
+              { translations.i_tabTitleBenefitPrograms }
+            </Menu.Item>
+          ),
+          render: () => {
+            return (
+              <Tab.Pane>
+                <GraphHolder
+                  client       = { client }
+                  Graph        = { BenefitsLines }
+                  translations = { translations } />
               </Tab.Pane>
             );
           },
         },
       ] } />
   );
-};
+};  // Ends <TabbedVisualizations>
 
-/** @todo Abstract all the step components?
- *
- * @function
- * @param {object} props See below.
- * @property {function} props.changeClient Updates state upstream.
- * @property {function} props.translate Uses user chosen language-specific
- *    snippets.
- * @property {object} props.client JSON object with future and current values.
- * @property {function} props.nextStep Go to next form section.
- * @property {function} props.previousStep Go to previous form section.
- *
- * @returns {object} Component
- */
-const PredictionsStep = function ({ changeClient, navData, client, snippets }) {
 
-  const setTimeProp = getTimeSetter('future', changeClient);
+const PredictionsStep = function ({ updateClientValue, navData, client, translations, openFeedback }) {
 
-  /** @todo Are these titles accurate now? */
   return (
-    <Form className = 'income-form flex-item flex-column'>
-      <FormPartsContainer
-        title     = 'What Might Happen?'
-        clarifier = { null }
-        navData   = { navData }>
+    <FormPartsContainer
+      title     = { translations.i_title }
+      clarifier = { null }
+      navData   = { navData }
+      formClass = { `predictions` }>
+      {/* `predictions-form`: This whole div will be outside
+        the form in the future and then we'll be able to
+        access its style that way */}
+      <div id={ `predictions-form` }>
         <IncomeForm
-          setClientProperty ={ setTimeProp }
-          future            ={ client.future }
-          time              ={ 'future' } />
-        <Divider className='ui section divider hidden' />
+          updateClientValue = { updateClientValue }
+          future            = { client.future }
+          time              = { `future` }
+          translations      = { translations } />
+        <Divider className={ `ui section divider hidden` } />
+      </div>
+      <div id={ `results-intro` }>
         <Header
-          as        ='h3'
-          className ='ui Header align centered'>
-            With the new pay, how could your benefits change?
+          as        = { `h3` }
+          className = { `ui Header align centered` }>
+          { translations.i_chartsHeader }
         </Header>
-        <TabbedVisualizations client={ client } />
-      </FormPartsContainer>
-    </Form>
+        <Message
+          visible
+          warning
+          className = { `prediction-message` }>
+          { translations.i_warningMessage }
+          <Button
+            compact
+            className = { `feedback-button` }
+            size      = { `small` }
+            color     = { `teal` }
+            onClick   = { openFeedback }>
+            { translations.i_submitFeedback }
+          </Button>
+        </Message>
+      </div>
+      <TabbedVisualizations 
+        client       = { client }
+        openFeedback = { openFeedback }
+        translations = { translations } />
+    </FormPartsContainer>
   );
-};  // End FutureIncomeStep() Component
+};  // End <PredictionsStep>
+
 
 export { PredictionsStep };
-                                              

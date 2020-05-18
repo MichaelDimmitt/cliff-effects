@@ -10,7 +10,7 @@ import React from 'react';
  */
 class ErrorListener extends React.Component {
   handleError = ({ error }) => {
-    var promptData = {
+    let promptData = {
       header:    'There was an unexpected error. Do you want to submit feedback?',
       leaveText: 'Reset',
     };
@@ -21,15 +21,15 @@ class ErrorListener extends React.Component {
 
   componentDidMount() {
     window.addEventListener('error', this.handleError);
-  }
+  };
 
   componentWillUnmount() {
     window.removeEventListener('error', this.handleError);
-  }
+  };
 
   render() {
     return null;
-  }
-}
+  };
+};
 
-export default ErrorListener;
+export { ErrorListener };

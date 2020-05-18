@@ -1,23 +1,27 @@
+/* Global/Root styles */
+
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
 }
 
-form .field-aligner {
-  display: inline-block;
-  text-align: left;
+#root {
+  height:  100%;
 }
 
+/* AboutContent.js styles */
+
+.ac-header {
+  font-size: 4em;
+}
+
+/* App.js styles */
 #App {
   min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-#root {
-  height:  100%;
 }
 
 #HashRouter {
@@ -26,21 +30,66 @@ form .field-aligner {
   flex-direction: column;
 }
 
-#HomePage {
-  background-image: url(./images/splash.svg) !important;
-  background-size: cover !important;
-  flex: 1 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+/* Footer.js styles */
+
+.footer_segment {
+  padding: 2em 0em;
 }
 
-#HomeContent {
-  flex: 1 0;
+/* Header.js styles */
+
+#appHeader {
   display: flex;
-  justify-content: center;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.header-segment {
+  padding: 1em 0em;
+}
+
+#appHeader .menu {
+  margin: 0;
+}
+
+.ui.inverted.menu .item, .ui.inverted.menu .item>a:not(.ui):hover {
+  color: #003D3A;
+}
+
+/* PageLayout.js styles */
+
+.pl-segment {
+  padding: 8em 0em;
+}
+
+/* Predictions.js */
+.print-row {
+  margin-top: 1em;
+  text-align: right;
+}
+
+.feedback-button {
+  display: inline;
+}
+
+.prediction-message {
+  text-align: center;
+}
+
+/* VisitPage.js styles */
+
+#form-nav, .current-step-component {
+  padding: 14px 0;
+}
+
+form .field-aligner {
+  display: inline-block;
+  text-align: left;
+}
+
+/* Fixing (currently) link styles */
+.neutral-link {
+  color: white;
 }
 
 /*
@@ -48,38 +97,68 @@ Used to fill vertical space.
 `height: 100%` doesn't work with Flexbox on Mobile Safari.
 */
 .flex-column {
-  display: flex!important;
+  display: flex;
   flex-direction: column;
 }
 .flex-item {
   flex: 1 0;
 }
 
-.center-contents {
-  display: flex;
-  justify-content: center;
+.heading-with-detail .middle {
+  white-space: nowrap;
+}
+
+#cliff-effects-tool {
+  padding: 42px 0;
+}
+
+#cliff-effects-tool .show-on-yes {
+  display: inline-block;
+}
+
+#cliff-effects-tool .form .cashflow-display {
+  margin-bottom: 1em;
 }
 
 .ui.form h4.ui.header.cashflow-column,
 .ui.form .cashflow .cashflow-column {
-  display: inline-block;
-  margin-right: .2em !important;
+  margin-right: .2em;
   width: 7em;
   text-align: center;
 }
 
-.ui.form h4.ui.header.cashflow-column:last-child,
-.ui.form .cashflow .cashflow-column:last-child,
-.ui.form .cashflow .cashflow-column-last-child {
-  text-align: left;
-  width: auto;
-  padding-left: 1em !important;
+.ui.form h4.ui.header.cashflow-column {
+  margin-top: 0;
+  display: inline-block;
 }
 
-.ui.form .cashflow .cashflow-column .ui.input input {
+#cliff-effects-tool .form .cashflow .cashflow-column.output-number,
+#cliff-effects-tool .form .cashflow .cashflow-column.output-number input {
   text-align: right;
   width: 7em;
   display: inline-block;
+}
+
+#cliff-effects-tool .form .cashflow .cashflow-column.output-number {
+  margin-bottom: 0;
+}
+
+#cliff-effects-tool .form .cashflow-display .cashflow-column.output-number {
+  padding-right: 1em;
+  margin-top: .5em;
+  margin-bottom: .5em;
+}
+
+.ui.form h4.ui.header.cashflow-column:last-child,
+.ui.form .cashflow .cashflow-column-label {
+  text-align: left;
+  width: auto;
+  padding-left: 1em;
+}
+
+.ui.form .cashflow .cashflow-column {
+  display: inline-flex;
+  align-items: center;
 }
 
 /* One of these two groups */
@@ -98,6 +177,9 @@ Used to fill vertical space.
 .label-info { display: inline; }
 .label-info.hidden { display: none; }
 
+.button.ui.large.big-button {
+  flex-basis: 130px;
+}
 
 .massive-toggle .ui.toggle.checkbox input~label:before {
     background-color: rgba(0, 0, 0, 0.23);
@@ -112,11 +194,72 @@ Used to fill vertical space.
     transform: scale(0.85) translate(-10%, 0);
 }
 
+
+/* HOUSEHOLD */
 #addMember {
     padding: 0;
     padding-top: .5rem;
     padding-bottom: .5rem;
     margin-top: 0.7rem;
+}
+
+.household .column {
+  display:   inline-block;
+  text-align: center;
+  margin-top: 0.7em;
+}
+
+.household .column-headers {
+  margin-bottom: .5em;
+}
+
+.ui .household .column-headers h4.ui.header.household-column {
+  padding-left: 0;
+}
+
+.household .add-row-column {
+  margin: 0;
+}
+
+.household .column-one {
+  width: 5em;
+}
+.household .column-two {
+  width: 20em;
+  text-align: left;
+  padding-left: 1em;
+}
+.household .column-three {
+  width: 5em;
+}
+.household .column-four {
+  width: 10em;
+}
+
+.household .member .remove.button {
+  padding: 0;
+  height: 2.2em;
+  width: 2.2em;
+}
+
+.household .role {
+  display: inline-block;
+  width: 100%;
+  text-align: left;
+}
+
+.household .role.head {
+  margin-left: 0em;
+}
+
+.household .role.second-member-choice {
+  margin-left: -1em;
+}
+
+.household i.no-removing {
+  color: #cfcfd0;
+  font-size: 2.2em;
+  vertical-align: text-top;
 }
 
 /* Override text unselectable in semantic-ui-react */
@@ -154,31 +297,20 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 0; /* Removes leftover margin */
 }
 
-/* Old selector used for 'Submit Feedback' and 'Reset' buttons */
-.fixed {
-  top: 6.2em;
-  left: -.75em;
-  position: fixed;
-}
-
-.rotate {
-    transform-origin: top left;
-    transform: rotate(270deg);
-}
-
 /* CHARTS */
+/* Around graphs */
 .graph-holder {
   position: relative;
   min-height: 7rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
+  display: block;
+  text-align: center;
 }
 
 .graph-time-options {
   position: absolute;
   top: 2em;
-  right: 0;
+  left: 0;
+  z-index: 1;
 }
 
 .client-graph.ui.message {
@@ -186,14 +318,75 @@ input[type=number]::-webkit-outer-spin-button {
   margin-bottom: 0;
 }
 
+@media only speech {
+  .graph-time-options {
+    position: static;
+  }
+}
+
+@media only screen and (max-width: 75rem) {
+  .graph-time-options {
+    position: static;
+  }
+}
+
+@media only screen and (max-width: 27rem) {
+  .graph-time-options {
+    width: 100%;
+  }
+  .graph-time-options .ui.button {
+    padding: .8em;
+  }
+}
+
+/* Shared */
+.graph-label {
+  display: inline-block;
+  width: 4em;
+  text-align: right;
+}
+
+/* Zooming in charts/graphs */
+.highcharts-plot-background {
+  /* Otherwise cursor styles won't apply */
+  fill: white;
+}
+
+.zoomable .highcharts-plot-background,
+.zoomable .highcharts-grid,
+.zoomable .highcharts-series-group {
+  cursor: zoom-in;
+}
+
+.zoomable.alt-down .highcharts-plot-background,
+.zoomable.alt-down .highcharts-grid,
+.zoomable.alt-down .highcharts-series-group {
+  cursor: grab;
+}
+
+.zoomable.alt-down:active .highcharts-plot-background,
+.zoomable.alt-down:active .highcharts-grid,
+.zoomable.alt-down:active .highcharts-series-group {
+  cursor: grabbing;
+}
+
+/* Lines graph. Needed? */
+/*.client-graph {
+  width: 100%;
+}*/
+
 /* FORM ELEMENTS */
+
+.form-section-bottom-row {
+  display: flex;
+  justify-content: space-between;
+}
 
 /* - Yes/No Toggle - */
 /* WARNING: Non-column appearance will remain until radio
 buttons are put on the left side. */
 .radio-yes-no {
   display: flex;
-  margin-bottom: 1rem;
 }
 
 .ui.form .radio-yes-no .field {
@@ -216,8 +409,10 @@ buttons are put on the left side. */
   margin-right: 1rem;
 }
 
-.attention-arrow i.fitted.attention-font {
-  line-height: .6em;
+.attention-arrow i.fitted.attention-font:before {
+  /* Not sure where this style came from, but has to be fixed
+  * for vertical center alignment. */
+  line-height: normal;
 }
 
 /* Give padding between elements, but not at the start
@@ -236,35 +431,51 @@ form elements. */
 }
 
 
-/* FEEDBACK BUTTON */
-#feedback_fixed {
-    position: fixed;
-    top: 234px;
-    left: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+/* FORM EVER-PRESENT BUTTONS */
+#alwaysLeftButtons {
+  /* Would like to use `position: sticky;`, but it's
+   * not supported by IE at all. A bit premature, but
+   * also obscure and may be hard to fix after-the-fact */
+  position: fixed;
+  transform-origin: top left;
+  transform: rotate(270deg) translateX(-100%);
+  top: 6.2rem;
+  left: 0;
+  display: flex;
+  width: fit-content;
 }
 
-/* RESET BUTTON */
-#reset_fixed {
-    position: fixed;
-    top: 362px;
-    left: 0;
+/* LEFT BUTTONS' OWN STYLES */
+#alwaysLeftButtons .button {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    background-color: #f2711c;
+    margin-right: .7rem;
 }
 
-#reset_fixed:hover {
-  background-color: #d16614;
+#alwaysLeftButtons .button:last-child {
+  margin-right: 0;
+}
+
+/* FUNCTIONAL */
+.has-details {
+  display: inline-block;
+}
+
+i.icon.details-icon {
+  margin-left: .5em;
+  margin-right: 1em;
+  font-size: 1.2em;
 }
 
 
 /* =============== */
 /* PREDICTIONS (manual theme implementation) */
 /* =============== */
-/* If theme is changed, this will have to be changed by hand */
+#results-intro {
+  margin-bottom: 1em;
+}
 
+/* If theme is changed, this will have to be changed by hand */
 .ui.attached.tabular.menu {
   border-bottom-color: #00b6ad;
 }
@@ -289,7 +500,258 @@ form elements. */
   border-bottom-left-radius: 0;
 }
 
-.button.ui.teal.large.button {
-  padding-left: .25em;
-  padding-right: .25em;
+.text-result-section {
+  margin-bottom: 2em;
 }
+
+
+/* =============== */
+/* LAYOUT */
+/* =============== */
+/* Surrounder (general) */
+.question-spacer {
+  display: block;
+  height: 1em;
+}
+
+.benefits .radio-yes-no:not(:last-child) {
+  margin-bottom: 1em;
+}
+
+.surrounder .horizontal,
+.surrounder .vertical {
+  display: flex;
+  align-content: stretch;
+}
+
+.surrounder .horizontal {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.surrounder .vertical {
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Surrounder (specific) */
+.heading-with-detail .surrounder .middle {
+  justify-content: flex-start;
+}
+
+.heading-with-detail .surrounder .visible.message.slide {
+  margin-bottom: 1em;
+}
+
+/* HomePage.js styles */
+
+#HomePage {
+  background-image: url(./images/splash.svg);
+  background-size: cover;
+  flex: 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#HomeContent {
+  flex: 1 0;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#HomePage .home-button {
+  background-color: #c8e7e5;
+  color: #465050;
+  font-size: 1.5em;
+  /* Copied from semantic-ui-react Button */
+  font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+  font-weight: 700;
+  line-height: 1em;
+  border-radius: .28571429rem;
+  /* Adjusted from semantic-ui-react Button */
+  padding: .78571429em 1.5em;
+}
+
+#HomePage .home-button:hover,
+#HomePage .home-button:focus {
+  color: #C8E7E5;
+  background-color: #005855;
+}
+
+.center-contents {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.home-disclaimer {
+  color: #efefef;
+  text-align: center;
+  font-size: 1em;
+}
+
+.headings h1 {
+  color: #efefef;
+  font-size: 5em;
+  margin-bottom: -15px;
+}
+
+.headings h2 {
+  color: #efefef;
+  font-size: 2em;
+  margin-top: -15px;
+  margin-right: 45px;
+  text-align: right;
+}
+
+.main-wrapper {
+  display: inline-block;
+}
+
+/*
+=================
+ACCESSIBILITY - Also see any other focus styles
+=================
+*/
+body .ui *:focus,
+#App a:focus {
+  outline: 5px double rgba(0, 121, 116, 1);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+#App #HomePage a:focus {
+  outline: 5px double rgba(0, 97, 93, 1);
+}
+
+/* Without #root, these selectors don't win */
+#root input:focus~label:before,
+#root .form *:focus {
+  border: 1px solid rgba(0, 121, 116, 1);
+  outline: 2px solid rgba(0, 121, 116, 1);
+  outline-offset: 1px;
+}
+
+/*
+=================
+STYLES FOR COMMUNICATION
+@todo Figure out color-blind indicators as well
+=================
+*/
+#App .button.caution {
+    color: white;
+    background-color: #f2711c;
+}
+
+#App .button.caution:hover {
+  background-color: #d16614;
+}
+
+#root .message-above {
+  font-weight: 700;
+  margin-bottom: .4rem;
+}
+
+#root .invalid {
+  color: red;
+  font-weight: 700;
+  margin-bottom: .4rem;
+}
+
+/*
+=================
+PRINTING STYLES
+=================
+*/
+
+/* `margin: 0` at bottom working without print,
+    not working for print when cliff present. Why? */
+@media print {
+  @page {
+    size: portrait;
+  }
+
+  #appHeader,
+  #feedback_fixed,
+  #reset_fixed,
+  #form-nav,
+  #section-bottom,
+  #predictions-form,
+  #results-intro,
+  #App .tabular.menu,
+  .print-row {
+    display: none;
+  }
+
+  #cliff-effects-tool,
+  #App .very.padded.segment {
+    padding: 0;
+  }
+
+  #App .bottom.segment {
+    border: 0;
+  }
+
+  #root #App .ui.segment {
+    margin: 0;
+  }
+
+  .section-header span {
+    color: black;
+  }
+
+  #App .footer_segment {
+    background: transparent;
+  }
+
+  #App .footer_segment a,
+  #App .footer_segment p,
+  #App .footer_segment span {
+    color: black;
+  }
+}
+
+/*
+=========================
+SMALL SCREEN
+=========================
+*/
+@media only screen and (max-width: 767px) {
+  #alwaysLeftButtons {
+    /* Fighting semantic-ui that use `!important` at this width */
+    margin-right: 0!important;
+    margin-left: 0!important;
+  }
+}
+
+
+/*
+=========================
+PREDICTIONS WARNING MODAL
+=========================
+*/
+#WarningModal .header {
+  color: #fff;
+  background-color: rgb(136,0,21);
+}
+
+/* Semantic UI Default Overrides */
+
+.mini.ui.steps a.step:hover, .mini.ui.steps a.step:hover:after {
+  background: #dcddde;
+}
+
+.ui.selection.dropdown .menu>.item:hover {
+  background-color: #adb1b5;
+}
+
+.ui.selection.dropdown .menu>.selected.item {
+  background-color: #dcddde;
+}
+
+

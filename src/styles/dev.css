@@ -1,0 +1,62 @@
+
+#App .dev-switch {
+  margin: 1em;
+}
+
+#App .dev-hud {
+  position: fixed;
+  align-self: flex-end;
+  min-height: 0px;
+  max-height: 100%;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+.dev-hud .dev-menu {
+  overflow-y: scroll;
+}
+
+.dev-hud input,
+.dev-hud button,
+.dev-hud .heading-with-detail i {
+  pointer-events: all;
+}
+
+.dev-hud .ui.hide {
+  margin: 0;
+  padding: 0.5em;
+  height: 2em;
+  border-top: 1px solid rgb(200, 200, 200);
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.dev .dev-hud .checkbox {
+  white-space: nowrap;
+}
+
+.dev .dev-hud .load-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dev .dev-hud .message {
+  white-space: pre-wrap;
+}
+
+#App.dev.devHidden .dev-menu {
+  height: 0;
+  overflow: hidden;
+}
+
+.dev.english .translation[lang="en"] {
+  color: red;
+  text-decoration: underline red double;
+}
+
+.dev.nonEnglish .translation:not([lang="en"]) {
+  color: blue;
+  text-decoration: underline blue;
+}

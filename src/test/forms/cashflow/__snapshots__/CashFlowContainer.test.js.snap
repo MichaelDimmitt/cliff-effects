@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CashFlowRow> renders with message 1`] = `
+<CashFlowRow
+  label="Rent"
+  message="What did you enter!?"
+  validRow={false}
+>
+  <FormField
+    className="cashflow"
+    inline={true}
+  >
+    <div
+      className="inline field cashflow"
+    >
+      <ValidationError
+        isUserError={true}
+        message="What did you enter!?"
+      >
+        <div
+          className="with-message-above "
+        >
+          <div
+            className="message-above invalid"
+            id="undefinedMessage"
+            tabIndex={-1}
+          >
+            What did you enter!?
+          </div>
+          <div
+            className="below-message"
+          >
+            <div
+              className="cashflow-row"
+            >
+              <span>
+                Some content
+              </span>
+              <div
+                className="cashflow-column cashflow-column-label"
+              >
+                <label
+                  htmlFor="undefined_monthly"
+                  id="undefinedLabel"
+                  tabIndex="-1"
+                >
+                  Rent
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ValidationError>
+    </div>
+  </FormField>
+</CashFlowRow>
+`;
+
+exports[`<CashFlowRow> renders with no message 1`] = `
+<CashFlowRow
+  label="Rent"
+  validRow={true}
+>
+  <FormField
+    className="cashflow"
+    inline={true}
+  >
+    <div
+      className="inline field cashflow"
+    >
+      <ValidationError
+        isUserError={false}
+      >
+        <div
+          className="with-message-above "
+        >
+          <div
+            className="below-message"
+          >
+            <div
+              className="cashflow-row"
+            >
+              <span>
+                Some content
+              </span>
+              <div
+                className="cashflow-column cashflow-column-label"
+              >
+                <label
+                  htmlFor="undefined_monthly"
+                  id="undefinedLabel"
+                  tabIndex="-1"
+                >
+                  Rent
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ValidationError>
+    </div>
+  </FormField>
+</CashFlowRow>
+`;

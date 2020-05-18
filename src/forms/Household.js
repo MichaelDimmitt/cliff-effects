@@ -3,21 +3,19 @@ import React from 'react';
 import {
   Button,
   Form,
-  Dropdown,
   Header,
   Checkbox,
   Icon,
 } from 'semantic-ui-react';
 
+import Select from 'react-select';
+
 // PROJECT COMPONENTS
-import {
-  FormPartsContainer,
-  ColumnHeading,
-  ManagedNumberField,
-} from './formHelpers';
+import { FormPartsContainer } from './FormPartsContainer';
+import { ColumnHeading } from '../components/headings';
+import { ManagedNumberField } from './inputs';
 
 // COMPONENT HELPER FUNCTIONS
-import { getTimeSetter } from '../utils/getTimeSetter';
 import {
   isNonNegWholeNumber,
   hasOnlyNonNegWholeNumberChars,
@@ -28,71 +26,57 @@ import { cloneDeep } from 'lodash';
 
 
 // ======================
-// GENERICS
+// REUSED
 // ======================
-// To be able to adjust sizes easily
-// Very specific to household size. May be worth creating
-// a constructor for columns in general, or maybe use a Grid.
-const columnStyle = {
-  display:   'inline-block',
-  textAlign: 'center',
-  marginTop: '0.7em',
-  // marginBottom: '0.7em'
-};
-
 const Columns = {};
 
 // `noMargin` is a bit hacky, but it'll do for now
-Columns.One = function ({ noMargin, children }) {
-  var marginTop = columnStyle.marginTop;
-  if (noMargin) {
-    marginTop = 0;
-  }
-  return (<div style={{ ...columnStyle, marginTop: marginTop, width: '5em' }}> {children} </div>);
+Columns.One = function ({ children, className }) {
+  className = className || ``;
+  return (
+    <div className={ className + ` column column-one` }>
+      { children }
+    </div>
+  );
 };
 
-Columns.Two = function ({ noMargin, children }) {
-  var marginTop = columnStyle.marginTop;
-  if (noMargin) {
-    marginTop = 0;
-  }
-  return (<div style={{ ...columnStyle, marginTop: marginTop, width: '20em', textAlign: 'left', paddingLeft: '1em' }}> {children} </div>);
+Columns.Two = function ({ children, className }) {
+  className = className || ``;
+  return (
+    <div className={ className + ` column column-two` }>
+      { children }
+    </div>
+  );
 };
 
-Columns.Three = function ({ noMargin, children }) {
-  var marginTop = columnStyle.marginTop;
-  if (noMargin) {
-    marginTop = 0;
-  }
-  return (<div style={{ ...columnStyle, marginTop: marginTop, width: '5em' }}> {children} </div>);
+Columns.Three = function ({ children, className }) {
+  className = className || ``;
+  return (
+    <div className={ className + ` column column-three` }>
+      { children }
+    </div>
+  );
 };
 
-Columns.Four = function ({ noMargin, children }) {
-  var marginTop = columnStyle.marginTop;
-  if (noMargin) {
-    marginTop = 0;
-  }
-  return (<div style={{ ...columnStyle, marginTop: marginTop, width: '10em' }}> {children} </div>);
+Columns.Four = function ({ children, className }) {
+  className = className || ``;
+  return (
+    <div className={ className + ` column column-four` }>
+      { children }
+    </div>
+  );
 };
 
 
-/** @todo description
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
 const ColumnHeader = function ({ children, columnNum }) {
 
-  var Container = Columns[ columnNum ];
+  let Container = Columns[ columnNum ];
 
   return (
     <Container>
       <ColumnHeading
-        type={ 'household' }
-        colName={ '' }>
+        type    = { `household` }
+        colName = { `` }>
         { children }
       </ColumnHeading>
     </Container>
@@ -101,28 +85,19 @@ const ColumnHeader = function ({ children, columnNum }) {
 };
 
 
-/** @todo description
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
 const MemberButton = function ({ basic, color, iconName, className, onClick }) {
 
   color = color || null;
 
   return (
     <Button
-      type={ 'button' }
-      basic={ !!basic }
-      color={ color }
-      icon={ iconName }
-      className={ className }
-      onClick={ onClick }
-      style={{ padding: '0', height: '2.2em', width: '2.2em' }}
-      circular />
+      circular
+      type      = { `button` }
+      basic     = { !!basic }
+      color     = { color }
+      icon      = { iconName }
+      className = { className }
+      onClick   = { onClick } />
   );
 
 };
@@ -132,285 +107,267 @@ const MemberButton = function ({ basic, color, iconName, className, onClick }) {
 // UNIQUE
 // ======================
 
-/** @todo description
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
-const Role = function ({ member, setMember, snippets }) {
+const Role = function ({ member, setMember, setDropdownMember, translations }) {
 
-  var ThisRole  = null,
-      margin   = '0';
+  let thisRole  = null,
+      className = `head`;
 
   if (member.index === 0) {
 
-    ThisRole  = <span>{ snippets.headOfHousehold }</span>;
+    thisRole = (<span>{ translations.i_headOfHousehold }</span>);
 
   } else if (member.index === 1) {
 
-    margin = '-1em';
+    className = `second-member-choice`;  // -1em
 
-    var options = [
-      { text: snippets.spouse, value: 'spouse' },
-      { text: snippets.childOther, value: 'member' }, 
+    let options = [
+      { label: translations.i_spouse, value: 'spouse', name: 'm_role' },
+      { label: translations.i_childOther, value: 'member', name: 'm_role' },
     ];
 
-    ThisRole = <Dropdown
-      selection
-      name={ 'm_role' }
-      value={ member.m_role }
-      options={ options }
-      onChange={ setMember } />;
+    let selectedValue = options.find((obj) => {
+      return obj.value === member.m_role;
+    });
+
+    thisRole = (
+      <Select
+        selection
+        name     = { `m_role` }
+        value    = { selectedValue }
+        options  = { options }
+        onChange = { setDropdownMember } />
+    );
 
   } else {
 
-    ThisRole = <span>{ snippets.childOther }</span>;
+    thisRole = (<span>{ translations.i_childOther }</span>);
 
-  }
+  }  // ends which member index
 
   // Styles will have to be adjusted.
-  return (
-    <div style={{ display: 'inline-block', width: '100%', textAlign: 'left', marginLeft: margin }}>
-      { ThisRole }
-    </div>
-  );
+  return (<div className={ `role ` + className }>{ thisRole }</div>);
 
-};  // End Role(<>)
+};  // Ends <Role>
 
 
-/** @todo description
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
-const MemberField = function ({ household, time, setHousehold, setClientProperty, snippets }, indx) {
+const MemberField = function ({ household, time, setHousehold, updateClientValue, translations }, indx) {
 
-  var member      = household[ indx ],
-      routeStart  = 'household/' + indx + '/';
-  member.index    = indx;  // Just needed as member prop in this file
+  let member     = household[ indx ],
+      routeStart = `household/` + indx + `/`;
+  member.index   = indx;  // Just needed as member prop in this file
 
+  let onMemberChange = function (evnt, inputProps) {
+    let route = routeStart + inputProps.name,
+        data  = { route: route, value: inputProps.value };
+    updateClientValue(evnt, data);
+  };
 
-  var onMemberChange = function (evnt, inputProps) {
-    var route = routeStart + inputProps.name;
-    var data  = { route: route, value: inputProps.value };
-    setClientProperty(evnt, data);
+  let onMemberDropdownChange = function (selectedOption) {
+    const data = {
+      route: routeStart + selectedOption.name,
+      value: selectedOption.value,
+    };
+    updateClientValue(selectedOption, data);
   };
 
 
-  var onMemberChecked = function (evnt, inputProps) {
-    var route = routeStart + inputProps.name;
-    var data  = { route: route, value: inputProps.checked };
-    setClientProperty(evnt, data);
+  let onMemberChecked = function (evnt, inputProps) {
+    let route = routeStart + inputProps.name,
+        data  = { route: route, value: inputProps.checked };
+    updateClientValue(evnt, data);
   };
 
-
-  var removeMember = function (evnt, inputProps) {
+  let removeMember = function (evnt, inputProps) {
     household.splice(indx, 1);
     setHousehold(evnt, household);
-  };  // End removeMember()
+  };
 
+  // For keyboard access (already does spacebar)
+  let onKeyDown = function (evnt) {
+    if (evnt.key === `Enter`) {
+      evnt.target.click();
+    }
+  };
+
+  let format = function (value) {
+    return value;
+  };
+
+  let onBlur = function () {
+    return true;
+  };
 
   // The font size thing is a bit weird, but... later
   return (
     <Form.Field
-      className='flex-item'
-      key={ indx }>
+      className = { `flex-item member` }
+      key       = { indx }>
 
       <Columns.One>
-        { indx > 0
-          ? <MemberButton
-            className={ 'remove' }
-            onClick={ removeMember }
-            iconName={ 'remove' } />
-          :
-          <span>{ household.length > 1
-            ? <Icon
-              fitted
-              name={ 'ban' }
-              style={{ color: '#cfcfd0', fontSize: '2.2em', verticalAlign: 'text-top' }} />
-            : null
-          }
+        { (indx > 0) ? (
+          <MemberButton
+            className = { `remove` }
+            onClick   = { removeMember }
+            iconName  = { `remove` } />
+        ) : (
+          <span>
+            { (household.length > 1) ? (
+              <Icon
+                fitted
+                className = { `no-removing` }
+                name      = { `ban` } />
+            ) : (
+              null
+            ) }
           </span>
-        }
+        ) }
       </Columns.One>
 
       <Columns.Two>
         <Role
-          member={ member }
-          setMember={ onMemberChange }
-          snippets={ snippets } />
+          member           = { member }
+          setMember        = { onMemberChange }
+          setDropdownMember={ onMemberDropdownChange }
+          translations     = { translations } />
       </Columns.Two>
 
       <Columns.Three>
         <ManagedNumberField
           value            = { member.m_age }
-          name             = { 'm_age' }
-          className        = { time + ' member-age ' + time }
+          name             = { `m_age` }
+          className        = { time + ` member-age ` }
           displayValidator = { hasOnlyNonNegWholeNumberChars }
           storeValidator   = { isNonNegWholeNumber }
-          format           = { function (value) { return value; } }
+          format           = { format }
           store            = { onMemberChange }
-          onBlur           = { function () { return true; } } />
+          onBlur           = { onBlur } />
       </Columns.Three>
 
       <Columns.Four>
         <Checkbox
-          name={ 'm_disabled' }
-          checked={ member.m_disabled }
-          onChange={ onMemberChecked } />
+          name      = { `m_disabled` }
+          checked   = { member.m_disabled }
+          onChange  = { onMemberChecked }
+          onKeyDown = { onKeyDown } />
       </Columns.Four>
 
     </Form.Field>
   );
 
-};  // End MemberField()
+};  // Ends <MemberField>
 
 
-/** @todo description
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
-const getMembers = function (current, time, setHousehold, setClientProperty, snippets) {
+const getMembers = function (current, time, setHousehold, updateClientValue, translations) {
 
-  var household = current.household,
+  let household = current.household,
       props     = {
         household:         household,
         time:              time,
         setHousehold:      setHousehold,
-        setClientProperty: setClientProperty,
-        snippets:          snippets,
+        updateClientValue: updateClientValue,
+        translations:      translations,
       };
 
-  var mems = [];
+  let mems = [];
   for (let memi = 0; memi < household.length; memi++) {
     mems.push(MemberField(props, memi));
   };
 
   return mems;
 
-};  // End getMembers()
+};
 
 
-/** @todo description
-*
-* @todo Could this be a number field? If not, then a dropdown?
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
-const HouseholdContent = function ({ current, time, setClientProperty, snippets }) {
+const HouseholdContent = function ({ current, time, updateClientValue, translations }) {
 
   // Don't mutate state properties
-  var household = cloneDeep(current.household);
+  let household = cloneDeep(current.household);
 
+  let setHousehold = function (evnt, newHousehold) {
 
-  var setHousehold = function (evnt, newHousehold) {
-
-    var obj = {
-      route: 'household',
+    let obj = {
+      route: `household`,
       value: newHousehold,
     };
 
-    setClientProperty(evnt, obj);
+    updateClientValue(evnt, obj);
 
-  };  // End setHousehold()
+  };
 
+  let addMember = function (evnt, inputProps) {
 
-  var addMember = function (evnt, inputProps) {
-
-    var member = household.length === 1
-      ? { m_age: 30, m_role: 'spouse', m_disabled: false }
-      : { m_age: 12, m_role: 'member', m_disabled: false };
+    let member;
+    if (household.length === 1) {
+      member = { m_age: 30, m_role: `spouse`, m_disabled: false };
+    } else {
+      member = { m_age: 12, m_role: `member`, m_disabled: false };
+    }
 
     household.push(member);
     setHousehold(evnt, household);
 
-  };  // End addMember()
-
+  };
 
   return (
-    <div className='field-aligner two-column'>
-      <div style={{ marginBottom: '.5em' }}>
-        <ColumnHeader columnNum='One' />
-        <ColumnHeader columnNum='Two'> { snippets.role }</ColumnHeader>
-        <ColumnHeader columnNum='Three'>{ snippets.age }</ColumnHeader>
-        <ColumnHeader columnNum='Four'>{ snippets.disabled }</ColumnHeader>
+    <div className={ `field-aligner two-column` }>
+      <div className={ `column-headers flex-item` }>
+        <ColumnHeader columnNum={ `One` } />
+        <ColumnHeader columnNum={ `Two` }>{ translations.i_role }</ColumnHeader>
+        <ColumnHeader columnNum={ `Three` }>{ translations.i_age }</ColumnHeader>
+        <ColumnHeader columnNum={ `Four` }>{ translations.i_disabled }</ColumnHeader>
       </div>
 
-      { getMembers(current, time, setHousehold, setClientProperty, snippets) }
+      { getMembers(current, time, setHousehold, updateClientValue, translations) }
 
       <Button
-        type={ 'button' }
-        id={ 'addMember' }
         basic
-        onClick={ addMember }>
-        <Columns.One noMargin={ true }>
+        type    = { `button` }
+        id      = { `addMember` }
+        onClick = { addMember }>
+        <Columns.One className={ `add-row-column` }>
           <Icon
-            name={ 'plus' }
             circular
             inverted
-            color={ 'teal' } />
+            name  = { `plus` }
+            color = { `teal` } />
         </Columns.One>
 
-        <Columns.Two noMargin={ true }>
+        <Columns.Two className={ `add-row-column` }>
           <Header
-            as='h4'
-            color={ 'teal' }> 
-            { snippets.addMember }
+            as    = { `h4` }
+            color = { `teal` }>
+            { translations.i_addMember }
           </Header>
         </Columns.Two>
 
-        <Columns.Three noMargin={ true } />
-        <Columns.Four noMargin={ true } />
+        <Columns.Three className={ `add-row-column` } />
+        <Columns.Four className={ `add-row-column` } />
       </Button>
 
     </div>
   );
 
-};  // End HouseholdContent()
+};  // Ends <HouseholdContent>
 
 
-/** @todo description
-*
-* @function
-* @param {object} props
-* @property {object} props.__ - explanation
-*
-* @returns Component
-*/
 // `props` is a cloned version of the original props. References broken.
-const HouseholdStep = function ({ changeClient, navData, client, snippets }) {
-
-  const setTimeProp = getTimeSetter('current', changeClient);
+const HouseholdStep = function ({ updateClientValue, navData, client, translations }) {
 
   return (
-    <Form className='current-household-size-form flex-column flex-item'>
-      <FormPartsContainer
-        title     = { snippets.title }
-        clarifier = { snippets.clarifier }
-        navData   = { navData }>
-        <HouseholdContent
-          setClientProperty={ setTimeProp }
-          current={ client.current }
-          time={ 'current' }
-          snippets={ snippets } />
-      </FormPartsContainer>
-    </Form>
+    <FormPartsContainer
+      title     = { translations.i_title }
+      clarifier = { translations.i_clarifier }
+      navData   = { navData }
+      formClass = { `household` }>
+      <HouseholdContent
+        updateClientValue = { updateClientValue }
+        current           = { client.current }
+        time              = { `current` }
+        translations      = { translations } />
+    </FormPartsContainer>
   );
 
-};  // End HouseholdStep()
+};
+
 
 export { HouseholdStep };

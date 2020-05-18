@@ -2,216 +2,256 @@
 import React from 'react';
 import { Table } from 'semantic-ui-react';
 
-// CUSTOM COMPONENTS
-// Both the table and graph should just be added to a results page, but
-// this will do for now
-
 // BENEFIT LOGIC
-import { getSNAPBenefits } from '../../programs/federal/snap';
-import { getSection8Benefit } from '../../programs/massachusetts/section8';
+import { applyAndPushBenefits } from '../../benefits/applyAndPushBenefits';
 
 // OBJECT MANIPULATION
 import { cloneDeep } from 'lodash';
 
 
+// @todo Move to utils file somewhere?
 const getSignSymbol = function (num) {
   if (num > 0) {
-    return '+';
+    return `+`;
+  } else if (num < 0) {
+    return `-`;
+  } else { return ``; }
+};
+
+
+const BenefitsTable = function ({ client, translations }) {
+  const clone = cloneDeep(client);
+  const curr = clone.current;
+
+  let allData         = {},
+      activeBenefits  = [
+        `earned`,
+        ...curr.benefits,
+      ];
+
+  let currentCalcData = {
+    activeBenefits: activeBenefits,
+    dataToAddTo:    allData,
+    clientToChange: clone,
+    timeframe:      `current`,
+    USState:        client.USState,
+  };
+  applyAndPushBenefits (currentCalcData);
+
+  // Add to the `current` data already there
+  let futureCalcData = {
+    activeBenefits: activeBenefits,
+    dataToAddTo:    allData,
+    clientToChange: clone,
+    timeframe:      `future`,
+    USState:        client.USState,
+  };
+  applyAndPushBenefits (futureCalcData);
+
+  let earned = allData.earned;
+  
+  let currentBenefits     = {},
+      futureBenefits      = {},
+      benefitDiffs        = {},
+      totalDiff           = 0,
+      totalBenefitCurrent = 0,
+      totalBenefitFuture  = 0;
+
+  for (let benefitIndex = 0; benefitIndex < curr.benefits.length; benefitIndex++) {
+    
+    let benefit       = curr.benefits[ benefitIndex ],
+        benefitData = allData[ benefit ];
+    
+    if (benefitData) {
+      let [
+        currentBenefit,
+        futureBenefit, 
+      ] = benefitData;
+      
+      currentBenefits[ benefit ] = Math.round(currentBenefit);
+      futureBenefits[ benefit ]  = Math.round(futureBenefit);
+
+      totalBenefitCurrent += currentBenefits[ benefit ];
+      totalBenefitFuture  += futureBenefits[ benefit ];
+    } else {
+      currentBenefits[ benefit ] = 0;
+      futureBenefits[ benefit ]  = 0;
+    }
+
+    benefitDiffs[ benefit ] = futureBenefits[ benefit ] - currentBenefits[ benefit ];
+    totalDiff += benefitDiffs[ benefit ];
   }
-  else if (num < 0) {
-    return '-';
+
+  let earnedCurrent = Math.round(earned[ 0 ]),
+      earnedFuture  = Math.round(earned[ 1 ]),
+      earnedDiff    = earnedFuture - earnedCurrent,
+      netCurrent    = totalBenefitCurrent + earnedCurrent,
+      netFuture     = totalBenefitFuture + earnedFuture,
+      netDiff       = totalDiff + earnedDiff;
+
+  // @todo Possible to break the following components out?
+  let columnHeaderStyle = {
+        background:    `rgba(0, 181, 173, 1)`,
+        color:         `white`,
+        fontSize:      `1.3em`,
+        fontWeight:    900,
+        textAlign:     `center`,
+        borderRadius:  `inherit`,
+        letterSpacing: `0.02em`,
+      },
+      totalsRowStyle = {
+        borderTop:  `2px solid rgba(0, 181, 173, 1)`,
+        fontWeight: 700,
+        fontSize:   `1.1em`,
+        padingTop:  `0.25em`,
+      },
+      rowHeaderStyle = {
+        fontSize:   `1.1em`,
+        fontWeight: 700,
+        textAlign:  `left`,
+      },
+      totalsRowHeaderStyle = {
+        fontSize:   `1.2em`,
+        fontWeight: 700,
+        textAlign:  `left`,
+        borderTop:  `2px solid rgba(0, 181, 173, 1)`,
+        padingTop:  `0.25em`,
+      };
+
+  const TotalBenefitsRow = function({ client, translations }){
+    if (client.current.benefits.length <= 1) {
+      return (null);
+    }
+
+    return (
+      <Table.Row>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowHeaderStyle }>
+          { translations.i_rowTotalBenefits }
+        </Table.Cell>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowStyle }>
+          { translations.i_beforeMoneyWithTime }{totalBenefitCurrent}{ translations.i_afterMoneyWithTime }
+        </Table.Cell>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowStyle }>
+          { translations.i_beforeMoneyWithTime }{totalBenefitFuture}{ translations.i_afterMoneyWithTime }
+        </Table.Cell>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowStyle }>
+          { getSignSymbol(totalDiff) } { translations.i_beforeMoneyWithTime }{ Math.abs(totalDiff) }{ translations.i_afterMoneyWithTime }
+        </Table.Cell>
+      </Table.Row>
+    );
+  };
+
+  const EarnedRow = function ({ translations }) {
+    return (
+      <Table.Row>
+        <Table.Cell style={ rowHeaderStyle }>{ translations.i_rowEarned }</Table.Cell>
+        <Table.Cell textAlign={ `right` }>{ translations.i_beforeMoneyWithTime }{earnedCurrent}{ translations.i_afterMoneyWithTime }</Table.Cell>
+        <Table.Cell textAlign={ `right` }>{ translations.i_beforeMoneyWithTime }{earnedFuture}{ translations.i_afterMoneyWithTime }</Table.Cell>
+        <Table.Cell textAlign={ `right` }>{ getSignSymbol(earnedDiff) } { translations.i_beforeMoneyWithTime }{ Math.abs(earnedDiff) }{ translations.i_afterMoneyWithTime }</Table.Cell>
+      </Table.Row>
+    );
+  };
+
+  const TotalsRow = function ({ translations }) {
+    return (
+      <Table.Row style={{ border: `none` }}>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowHeaderStyle }>
+          { translations.i_rowNetTotal }
+        </Table.Cell>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowStyle }>
+          { translations.i_beforeMoneyWithTime }{netCurrent}{ translations.i_afterMoneyWithTime }
+        </Table.Cell>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowStyle }>
+          { translations.i_beforeMoneyWithTime }{netFuture}{ translations.i_afterMoneyWithTime }
+        </Table.Cell>
+        <Table.Cell
+          textAlign = { `right` }
+          width     = { 3 }
+          style     = { totalsRowStyle }>
+          { getSignSymbol(netDiff) } { translations.i_beforeMoneyWithTime }{ Math.abs(netDiff) }{ translations.i_afterMoneyWithTime }
+        </Table.Cell>
+      </Table.Row>
+    );
+  };
+
+  const benefitRows = [];
+
+  for (let benefitIndex = 0; benefitIndex < curr.benefits.length; benefitIndex++) {
+    let benefit = curr.benefits[ benefitIndex ],
+        diff    = benefitDiffs[ benefit ],
+        label   = translations[ `i_row_${benefit}` ];
+
+    benefitRows.push(
+      <Table.Row
+        key={ benefit }>
+        <Table.Cell style={ rowHeaderStyle }>{ label }</Table.Cell>
+        <Table.Cell textAlign={ `right` }>{ translations.i_beforeMoneyWithTime }{currentBenefits[ benefit ]}{ translations.i_afterMoneyWithTime }</Table.Cell>
+        <Table.Cell textAlign={ `right` }>{ translations.i_beforeMoneyWithTime }{futureBenefits[ benefit ]}{ translations.i_afterMoneyWithTime }</Table.Cell>
+        <Table.Cell textAlign={ `right` }>{ getSignSymbol(diff) } { translations.i_beforeMoneyWithTime }{ Math.abs(diff) }{ translations.i_afterMoneyWithTime }</Table.Cell>
+      </Table.Row>
+    );
   }
-  else { return ''; }
-};  // End getSignSymbol()
-
-
-const BenefitsTable = function (props) {
-
-  var client = cloneDeep(props.client),
-      curr   = client.current;
-
-  var SNAPBenefitCurrent  = curr.hasSnap ? Math.round(getSNAPBenefits(client, 'current')) : 0,
-      SNAPBenefitFuture   = curr.hasSnap ? Math.round(getSNAPBenefits(client, 'future')) : 0,
-      SNAPDiff            = SNAPBenefitFuture - SNAPBenefitCurrent,
-      sec8BenefitCurrent  = curr.hasSection8 ? Math.round(getSection8Benefit(client, 'current')) : 0,
-      sec8BenefitFuture   = curr.hasSection8 ? Math.round(getSection8Benefit(client, 'future')) : 0,
-      sec8Diff            = sec8BenefitFuture - sec8BenefitCurrent,
-      totalBenefitCurrent = SNAPBenefitCurrent + sec8BenefitCurrent,
-      totalBenefitFuture  = SNAPBenefitFuture + sec8BenefitFuture,
-      totalDiff           = SNAPDiff + sec8Diff,
-      incomeCurrent       = Math.round(curr.earned),
-      incomeFuture        = Math.round(client.future.earned),
-      incomeDiff          = incomeFuture - incomeCurrent,
-      netCurrent          = totalBenefitCurrent + incomeCurrent,
-      netFuture           = totalBenefitFuture + incomeFuture,
-      netDiff             = totalDiff + incomeDiff;
-
-  /** @todo: linting - discuss indentation for object properties and colons */
-  const columnHeaderStyle = {
-          background:    'rgba(0, 181, 173, 1)',
-          color:         'white',
-          fontSize:      '1.3em',
-          fontWeight:    900,
-          textAlign:     'center',
-          borderRadius:  'inherit',
-          letterSpacing: '0.02em',
-        }
-        , totalsRowStyle    = {
-          borderTop:  '2px solid rgba(0, 181, 173, 1)',
-          fontWeight: 700,
-          fontSize:   '1.1em',
-          padingTop:  '0.25em',
-        }
-        , rowHeaderStyle    = {
-          fontSize:   '1.1em',
-          fontWeight: 700,
-          textAlign:  'left',
-        }
-        , totalsRowHeaderStyle = {
-          fontSize:   '1.2em',
-          fontWeight: 700,
-          textAlign:  'left',
-          borderTop:  '2px solid rgba(0, 181, 173, 1)',
-          padingTop:  '0.25em',
-
-
-        };
-
-
-  const SNAPBenefitRow = function(props){
-    if (!client.current.hasSnap) {
-      return (null);
-    }
-
-    return (
-      <Table.Row>
-        <Table.Cell style={ rowHeaderStyle }>SNAP</Table.Cell>
-        <Table.Cell textAlign='right'>${SNAPBenefitCurrent} / month</Table.Cell>
-        <Table.Cell textAlign='right'>${SNAPBenefitFuture} / month</Table.Cell>
-        <Table.Cell textAlign='right'>{ getSignSymbol(SNAPDiff) } ${ Math.abs(SNAPDiff) } / month</Table.Cell>
-      </Table.Row>
-    );
-  };
-
-  const Sec8BenefitRow  = function(props){
-    if (!client.current.hasSection8) {
-      return (null);
-    }
-
-    return (
-      <Table.Row>
-        <Table.Cell style={ rowHeaderStyle }>Section 8 Housing</Table.Cell>
-        <Table.Cell textAlign='right'>${sec8BenefitCurrent} / month</Table.Cell>
-        <Table.Cell textAlign='right'>${sec8BenefitFuture} / month</Table.Cell>
-        <Table.Cell textAlign='right'>{ getSignSymbol(sec8Diff) } ${ Math.abs(sec8Diff) } / month</Table.Cell>
-      </Table.Row>
-    );
-  };
-
-  const TotalBenefitsRow = function(props){
-    if (!client.current.hasSnap || !client.current.hasSection8) {
-      return (null);
-    }
-
-    return (
-      <Table.Row>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowHeaderStyle }>Total Benefits
-        </Table.Cell>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowStyle }>${totalBenefitCurrent} / month
-        </Table.Cell>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowStyle }>${totalBenefitFuture} / month
-        </Table.Cell>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowStyle }>{ getSignSymbol(totalDiff) } ${ Math.abs(totalDiff) } / month
-        </Table.Cell>
-      </Table.Row>
-    );
-  };
-
-  const IncomeRow = function (props) {
-    return (
-      <Table.Row>
-        <Table.Cell style={ rowHeaderStyle }>Income</Table.Cell>
-        <Table.Cell textAlign='right'>${incomeCurrent} / month</Table.Cell>
-        <Table.Cell textAlign='right'>${incomeFuture} / month</Table.Cell>
-        <Table.Cell textAlign='right'>{ getSignSymbol(incomeDiff) } ${ Math.abs(incomeDiff) } / month</Table.Cell>
-      </Table.Row>
-    );
-  };
-
-  const TotalsRow = function (props) {
-    return (
-      <Table.Row style={{ border: 'none' }}>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowHeaderStyle }>Net Total
-        </Table.Cell>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowStyle }>${netCurrent} / month
-        </Table.Cell>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowStyle }>${netFuture} / month
-        </Table.Cell>
-        <Table.Cell
-          textAlign='right'
-          width={ 3 }
-          style={ totalsRowStyle }>{ getSignSymbol(netDiff) } ${ Math.abs(netDiff) } / month
-        </Table.Cell>
-      </Table.Row>
-    );
-  };
 
   return (
-    <div>
-      <Table celled>
-        <Table.Header>
-          <Table.Row >
-            <Table.Cell
-              style={ columnHeaderStyle }
-              width={ 3 }>Benefit
-            </Table.Cell>
-            <Table.Cell
-              style={ columnHeaderStyle }
-              width={ 3 }>Current Benefits
-            </Table.Cell>
-            <Table.Cell
-              style={ columnHeaderStyle }
-              width={ 3 }>New Estimate
-            </Table.Cell>
-            <Table.Cell
-              style={ columnHeaderStyle }
-              width={ 3 }>Difference
-            </Table.Cell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          <SNAPBenefitRow client={ client } />
-          <Sec8BenefitRow client={ client } />
-          <TotalBenefitsRow client={ client } />
-          <IncomeRow />
-          <TotalsRow />
-        </Table.Body>
-      </Table>
-    </div>
+    <Table celled>
+      <Table.Header>
+        <Table.Row >
+          <Table.Cell
+            style = { columnHeaderStyle }
+            width = { 3 }>
+            { translations.i_columnBenefit }
+          </Table.Cell>
+          <Table.Cell
+            style = { columnHeaderStyle }
+            width = { 3 }>
+            { translations.i_columnCurrentBenefits }
+          </Table.Cell>
+          <Table.Cell
+            style = { columnHeaderStyle }
+            width = { 3 }>
+            { translations.i_columnNewEstimate }
+          </Table.Cell>
+          <Table.Cell
+            style = { columnHeaderStyle }
+            width = { 3 }>
+            { translations.i_columnDifference }
+          </Table.Cell>
+        </Table.Row>
+      </Table.Header>
+
+      <Table.Body>
+        { benefitRows }
+        <TotalBenefitsRow 
+          client       = { clone } 
+          translations = { translations } />
+        <EarnedRow translations={ translations } />
+        <TotalsRow translations={ translations } />
+      </Table.Body>
+    </Table>
   );
 
-};  // End BenefitsTable(<>)
+};  // Ends <BenefitsTable>
 
 
 export { BenefitsTable };

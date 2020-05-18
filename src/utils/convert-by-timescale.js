@@ -9,20 +9,20 @@
  * @param {string} startTimescale - timescale of the original
  *     value. Can be 'weekly', 'monthly', or 'yearly'.
  */
-var toYearlyFrom = function (amount, startTimescale) {
+let toYearlyFrom = function (amount, startTimescale) {
   
-  var converted = amount;
+  let converted = amount;
 
-  if (startTimescale === 'weekly') {
+  if (startTimescale === `weekly`) {
     converted = amount * 52;
-  } else if (startTimescale === 'monthly') {
+  } else if (startTimescale === `monthly`) {
     converted = amount * 12;
-  } else if (startTimescale === 'yearly') {
+  } else if (startTimescale === `yearly`) {
     // do nothing
   }
 
   return converted;
-};  // End toYearlyFrom()
+};
 
 
 /** Returns `amount` converted from whatever 'timescale' it was before
@@ -32,20 +32,20 @@ var toYearlyFrom = function (amount, startTimescale) {
  * @param {string} startTimescale - timescale of the original
  *     value. Can be 'weekly', 'monthly', or 'yearly'.
  */
-var toMonthlyFrom = function (amount, startTimescale) {
+let toMonthlyFrom = function (amount, startTimescale) {
   
-  var converted = amount;
+  let converted = amount;
 
-  if (startTimescale === 'weekly') {
+  if (startTimescale === `weekly`) {
     converted = amount * (4 + (1 / 3));
-  } else if (startTimescale === 'monthly') {
+  } else if (startTimescale === `monthly`) {
     // do nothing
-  } else if (startTimescale === 'yearly') {
+  } else if (startTimescale === `yearly`) {
     converted = amount / 12;
   }
 
   return converted;
-};  // End toMonthlyFrom()
+};
 
 
 /** Returns `amount` converted from whatever 'timescale' it was before
@@ -55,39 +55,39 @@ var toMonthlyFrom = function (amount, startTimescale) {
  * @param {string} startTimescale - timescale of the original
  *     value. Can be 'weekly', 'monthly', or 'yearly'.
  */
-var toWeeklyFrom = function (amount, startTimescale) {
+let toWeeklyFrom = function (amount, startTimescale) {
   
-  var converted = amount;
+  let converted = amount;
 
-  if (startTimescale === 'weekly') {
+  if (startTimescale === `weekly`) {
     // do nothing
-  } else if (startTimescale === 'monthly') {
+  } else if (startTimescale === `monthly`) {
     converted = amount / (4 + (1 / 3));
-  } else if (startTimescale === 'yearly') {
+  } else if (startTimescale === `yearly`) {
     converted = amount * 52;
   }
 
   return converted;
-};  // End toWeeklyFrom()
+};
 
-var timescaleMultipliers = {};
+let timescaleMultipliers = {};
 
 timescaleMultipliers.fromYearly = {
-  'Weekly':  1 / 12 / (4 + 1 / 3),
-  'Monthly': 1 / 12,
-  'Yearly':  1,
+  Weekly:  1 / 12 / (4 + 1 / 3),
+  Monthly: 1 / 12,
+  Yearly:  1,
 };
 
 timescaleMultipliers.fromMonthly = {
-  'Weekly':  1 / (4 + 1 / 3),
-  'Monthly': 1,
-  'Yearly':  12,
+  Weekly:  1 / (4 + 1 / 3),
+  Monthly: 1,
+  Yearly:  12,
 };
 
 timescaleMultipliers.fromWeekly = {
-  'Weekly':  1,
-  'Monthly': (4 + 1 / 3),
-  'Yearly':  52,
+  Weekly:  1,
+  Monthly: (4 + 1 / 3),
+  Yearly:  52,
 };
 
 

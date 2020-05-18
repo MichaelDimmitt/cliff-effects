@@ -1,34 +1,37 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 import { CurrentExpensesStep } from '../../forms/CurrentExpenses';
 
 import { CLIENT_DEFAULTS } from '../../utils/CLIENT_DEFAULTS';
-import snippets from '../../localization/en.js';
 
-test('Expenses step component renders as snapshot correctly', () => {
+// LOCALIZATION
+import { getTextForLanguage } from '../../utils/getTextForLanguage';
+
+
+const translations = getTextForLanguage(`en`);
+test('Expenses step component should render without error', () => {
   const navData = {
-          left:   { text: 'Previous', onClick: jest.fn() },
+          left:   (<div>Exp left</div>),
           middle: null,
-          right:  { text: 'Next', onClick: jest.fn() },
+          right:  (<div>Exp right</div>),
         },
-        changeClient     = jest.fn(),
-        saveForm         = jest.fn(),
-        askToResetClient = jest.fn(),
-        openFeedback     = jest.fn(),
-        formSnippets     = snippets.visitPage.currentExpenses;
+        updateClientValue = jest.fn(),
+        saveForm          = jest.fn(),
+        askToResetClient  = jest.fn(),
+        openFeedback      = jest.fn(),
+        formTranslations  = translations.visitPage.currentExpenses;
 
-  const wrapper = shallow(
-    <CurrentExpensesStep
-      currentStep       = { 4 }
-      client            = { CLIENT_DEFAULTS }
-      navData           = { navData }
-      changeClient      = { changeClient }
-      saveForm          = { saveForm }
-      askToResetClient  = { askToResetClient }
-      openFeedback      = { openFeedback }
-      snippets          = { formSnippets } />
-  );
-
-  expect(wrapper).toMatchSnapshot();
+  expect(() => {
+    mount(
+      <CurrentExpensesStep
+        client            = { CLIENT_DEFAULTS }
+        navData           = { navData }
+        updateClientValue = { updateClientValue }
+        saveForm          = { saveForm }
+        askToResetClient  = { askToResetClient }
+        openFeedback      = { openFeedback }
+        translations      = { formTranslations } />
+    );
+  }).not.toThrow();
 });
